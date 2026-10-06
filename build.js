@@ -1,6 +1,6 @@
 ﻿// Combines parts/*.txt into data.js. n*.txt = niche (daily pool, window.N); the rest = classic (window.P).
 const fs = require('fs');
-const junk = new Set(['wergeld-ling', 'pipistrelling', 'kerfuffle-oo']);
+const junk = new Set(['wergeld-ling', 'pipistrelling', 'kerfuffle-oo', 'three billy board', 'shane 2', 'phpht', 'bys', 'dys', 'android']);
 const seen = new Set(), N = [], P = [];
 for (const f of fs.readdirSync('parts').sort()) {
   for (let line of fs.readFileSync('parts/' + f, 'utf8').replace(/^﻿/, '').split(/\r?\n/)) {
@@ -20,3 +20,4 @@ for (const f of fs.readdirSync('parts').sort()) {
 }
 fs.writeFileSync('data.js', 'window.N = ' + JSON.stringify(N) + ';\nwindow.P = ' + JSON.stringify(P) + ';\n');
 console.log('niche', N.length, 'classic', P.length);
+
