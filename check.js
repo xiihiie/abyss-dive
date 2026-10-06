@@ -1,0 +1,20 @@
+// Smoke test: run game.js against a stub DOM and check the scoring.
+const el = () => ({ classList: { toggle() {}, remove() {}, add() {} }, style: {}, insertAdjacentHTML() {}, firstChild: { firstChild: {} }, value: '', focus() {} });
+const els = {};
+global.window = {}; global.localStorage = { getItem: () => null, setItem() {} };
+global.document = { getElementById: id => els[id] || (els[id] = el()), body: { style: {} } };
+require('./data.js');
+const src = require('fs').readFileSync('game.js', 'utf8') + ';module.exports={score,PROMPTS,dailySet}';
+const m = new module.constructor(); m._compile(src, 'game.js');
+const { score, PROMPTS, dailySet } = m.exports;
+const fruit = PROMPTS.find(p => p.q === 'Name a fruit');
+const assert = require('assert');
+assert.equal(score(fruit, 'Apple').m, 5);
+assert.equal(score(fruit, 'apples').m, 5);
+assert(score(fruit, 'cloudberry').m === 100);
+assert.equal(score(fruit, 'pizza').m, 0);
+assert.equal(score(fruit, '  '), null);
+const usa = PROMPTS.find(p => p.q === 'Name a country');
+assert.equal(score(usa, 'United States').m, 5);
+assert.equal(dailySet().length, 7);
+console.log('ok', PROMPTS.length, 'prompts; today:', dailySet().map(p => p.q).join(' / '));
