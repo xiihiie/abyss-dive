@@ -1,20 +1,22 @@
-// Smoke test: run game.js against a stub DOM and check the scoring.
-const el = () => ({ classList: { toggle() {}, remove() {}, add() {} }, style: {}, insertAdjacentHTML() {}, firstChild: { firstChild: {} }, value: '', focus() {} });
+﻿// Smoke test: run game.js against a stub DOM and check the scoring.
+const el = () => ({ classList: { toggle() {}, remove() {}, add() {} }, style: { setProperty() {}, getPropertyValue: () => '0' }, insertAdjacentHTML() {}, appendChild() {}, append() {}, firstChild: { firstChild: {} }, value: '', focus() {} });
 const els = {};
 global.window = {}; global.localStorage = { getItem: () => null, setItem() {} };
-global.document = { getElementById: id => els[id] || (els[id] = el()), body: { style: {} } };
+global.setInterval = () => {};
+global.document = { getElementById: id => els[id] || (els[id] = el()), body: el(), createElement: el };
 require('./data.js');
-const src = require('fs').readFileSync('game.js', 'utf8') + ';module.exports={score,PROMPTS,dailySet}';
+const src = require('fs').readFileSync('game.js', 'utf8') + ';module.exports={score,PROMPTS,NICHE,dailySet}';
 const m = new module.constructor(); m._compile(src, 'game.js');
-const { score, PROMPTS, dailySet } = m.exports;
-const fruit = PROMPTS.find(p => p.q === 'Name a fruit');
+const { score, PROMPTS, NICHE, dailySet } = m.exports;
 const assert = require('assert');
-assert.equal(score(fruit, 'Apple').m, 5);
-assert.equal(score(fruit, 'apples').m, 5);
-assert(score(fruit, 'cloudberry').m === 100);
+const fruit = PROMPTS.find(p => p.q === 'Name a fruit');
+assert.equal(score(fruit, 'Apple').m, 10);
+assert.equal(score(fruit, 'apples').m, 10);
+assert.equal(score(fruit, 'cloudberry').m, 100);
 assert.equal(score(fruit, 'pizza').m, 0);
 assert.equal(score(fruit, '  '), null);
-const usa = PROMPTS.find(p => p.q === 'Name a country');
-assert.equal(score(usa, 'United States').m, 5);
+const ev = PROMPTS.find(p => p.q === 'Name an Eeveelution');
+assert.deepEqual(ev.a.map(a => score(ev, a).m), [10, 10, 30, 30, 60, 85, 85, 100]);
 assert.equal(dailySet().length, 7);
-console.log('ok', PROMPTS.length, 'prompts; today:', dailySet().map(p => p.q).join(' / '));
+assert(dailySet().every(p => NICHE.includes(p)));
+console.log('ok; today:', dailySet().map(p => p.q).join(' / '));

@@ -1,7 +1,7 @@
-// Combines parts/*.txt into data.js: dedupes prompts and answers, drops junk.
+﻿// Combines parts/*.txt into data.js. n*.txt = niche (daily pool, window.N); the rest = classic (window.P).
 const fs = require('fs');
 const junk = new Set(['wergeld-ling', 'pipistrelling', 'kerfuffle-oo']);
-const seen = new Set(), out = [];
+const seen = new Set(), N = [], P = [];
 for (const f of fs.readdirSync('parts').sort()) {
   for (let line of fs.readFileSync('parts/' + f, 'utf8').replace(/^﻿/, '').split(/\r?\n/)) {
     if (!line.includes('|')) continue;
@@ -15,9 +15,8 @@ for (const f of fs.readdirSync('parts').sort()) {
       if (!k || junk.has(s) || keys.has(k)) return false;
       keys.add(k); return true;
     });
-    out.push(q + '|' + ans.join(','));
+    (f.startsWith('n') ? N : P).push(q + '|' + ans.join(','));
   }
 }
-fs.writeFileSync('data.js', 'window.P = ' + JSON.stringify(out) + ';\n');
-const n = out.map(l => l.split('|')[1].split(',').length);
-console.log('prompts', out.length, 'min', Math.min(...n), 'avg', Math.round(n.reduce((a, b) => a + b) / n.length), 'under50', n.filter(x => x < 50).length);
+fs.writeFileSync('data.js', 'window.N = ' + JSON.stringify(N) + ';\nwindow.P = ' + JSON.stringify(P) + ';\n');
+console.log('niche', N.length, 'classic', P.length);
