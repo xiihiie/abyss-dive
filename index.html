@@ -35,15 +35,15 @@ input:focus{border-color:var(--accent);box-shadow:0 0 12px rgba(79,209,197,.35)}
 .hide{display:none}
 pre{white-space:pre-wrap;text-align:center;font:inherit}
 /* hook + line */
-#hookwrap{position:fixed;top:0;right:6vw;z-index:1;transition:transform 1.4s cubic-bezier(.3,1.3,.5,1);pointer-events:none}
-#hookwrap .line{width:2px;height:28vh;margin-left:15px;background:linear-gradient(#cfe8ff00,#cfe8ffaa)}
+#hookwrap{position:fixed;top:0;right:6vw;z-index:1;pointer-events:none}
+#hookwrap .line{width:2px;height:8vh;margin-left:15px;background:linear-gradient(#cfe8ff00,#cfe8ffaa)}
 #hookbody{transform-origin:16px 0;animation:sway 3s ease-in-out infinite}
 @keyframes sway{50%{transform:rotate(6deg)}}
 #hookbody.tug{animation:tug .6s ease-out,sway 3s ease-in-out .6s infinite}
 @keyframes tug{30%{transform:translateY(-18px) rotate(-8deg)}70%{transform:translateY(8px)}}
 #hookbody.snag{animation:snag .5s,sway 3s ease-in-out .5s infinite}
 @keyframes snag{20%,60%{transform:translateX(-8px) rotate(-12deg)}40%,80%{transform:translateX(8px) rotate(12deg)}}
-.pop{position:absolute;top:30vh;right:-10px;white-space:nowrap;font-size:26px;text-shadow:0 0 10px currentColor;animation:popup 1.6s ease-out forwards}
+.pop{position:absolute;bottom:-10px;right:-10px;white-space:nowrap;font-size:26px;text-shadow:0 0 10px currentColor;animation:popup 1.6s ease-out forwards}
 @keyframes popup{from{opacity:0;transform:translateY(20px) scale(.6)}20%{opacity:1;transform:scale(1.15)}to{opacity:0;transform:translateY(-80px)}}
 /* bubbles + fish */
 .bub{position:fixed;bottom:-20px;width:10px;height:10px;border:2px solid rgba(200,235,255,.6);border-radius:50%;z-index:0;pointer-events:none;animation:rise 1.5s ease-in forwards}
@@ -60,7 +60,7 @@ pre{white-space:pre-wrap;text-align:center;font:inherit}
 </head>
 <body>
 <div id="hookwrap" aria-hidden="true">
-  <div class="line"></div>
+  <div class="line" id="line"></div>
   <svg id="hookbody" width="32" height="56" viewBox="0 0 32 56" shape-rendering="crispEdges">
     <rect x="14" y="0" width="4" height="6" fill="#9fb3c8"/>
     <rect x="12" y="6" width="8" height="8" fill="#e05d5d"/><rect x="12" y="10" width="8" height="4" fill="#f4f4f4"/>

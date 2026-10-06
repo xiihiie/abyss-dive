@@ -9,13 +9,13 @@ const forms = s => { const n = norm(s); return [n, n.replace(/s$/, ''), n.replac
 
 // Tier by how far down the list the answer sits. Points: 10/30/60/85/100, miss = 0.
 const TIERS = [
-  { max: 0.2, pts: 10, name: 'Bubble', emoji: '🫧', blurb: 'everyone said that', color: '#7fb8e6' },
-  { max: 0.45, pts: 30, name: 'Minnow', emoji: '🐟', blurb: 'swimming with the crowd', color: '#4fd1c5' },
-  { max: 0.7, pts: 60, name: 'Jelly', emoji: '🪼', blurb: 'now we are sinking', color: '#b794f4' },
-  { max: 0.9, pts: 85, name: 'Angler', emoji: '🏮', blurb: 'seriously deep cut', color: '#f6ad55' },
-  { max: 1, pts: 100, name: 'Leviathan', emoji: '🐋', blurb: 'nobody else got that', color: '#ffd84d' },
+  { depth: 0.08, max: 0.2, pts: 10, name: 'Bubble', emoji: '🫧', blurb: 'everyone said that', color: '#7fb8e6' },
+  { depth: 0.36, max: 0.45, pts: 30, name: 'Minnow', emoji: '🐟', blurb: 'swimming with the crowd', color: '#4fd1c5' },
+  { depth: 0.6, max: 0.7, pts: 60, name: 'Jelly', emoji: '🪼', blurb: 'now we are sinking', color: '#b794f4' },
+  { depth: 0.82, max: 0.9, pts: 85, name: 'Angler', emoji: '🏮', blurb: 'seriously deep cut', color: '#f6ad55' },
+  { depth: 0.97, max: 1, pts: 100, name: 'Leviathan', emoji: '🐋', blurb: 'nobody else got that', color: '#ffd84d' },
 ];
-const MISS = { pts: 0, name: 'Snagged', emoji: '🪝', blurb: 'not on the list', color: '#fc8181' };
+const MISS = { depth: 0.03, pts: 0, name: 'Snagged', emoji: '🪝', blurb: 'not on the list', color: '#fc8181' };
 const RANKS = [[0, 'Surface skimmer'], [151, 'Reef wanderer'], [251, 'Twilight diver'], [351, 'Midnight lurker'], [450, 'Abyss legend']];
 const rank = m => RANKS.filter(r => m >= r[0]).pop()[1];
 
@@ -71,12 +71,24 @@ function draw() {
   // daily max is 700; unlimited keeps sinking but the visuals cap there
   const t = Math.min(1, total / 700);
   document.body.style.setProperty('--sink', t);
-  $('hookwrap').style.transform = `translateY(${t * 55}vh)`;
 }
 function addLog(r) {
   const t = TIERS.find(x => x.pts === r.m) || MISS;
   $('log').insertAdjacentHTML('afterbegin', `<div class="row"><span></span><span style="color:${t.color}">${t.emoji} +${r.m}</span></div>`);
   $('log').firstChild.firstChild.textContent = r.q + ' → ' + r.g;
+}
+// Drop the hook to the answer's depth (rarer = deeper, slower), hold, then reel it back up.
+function dive(s, done) {
+  const line = $('line');
+  const ms = 900 + s.depth * 1600;
+  line.style.transition = `height ${ms}ms cubic-bezier(.37,0,.63,1)`;
+  line.style.height = (8 + s.depth * 72) + 'vh';
+  setTimeout(() => pop(s), ms);
+  setTimeout(() => {
+    line.style.transition = 'height 600ms cubic-bezier(.5,0,.75,0)';
+    line.style.height = '8vh';
+    done();
+  }, ms + 900);
 }
 function pop(s) {
   // tier badge that floats up from the hook
@@ -114,12 +126,14 @@ $('f').onsubmit = e => {
   const p = set[at], s = score(p, $('a').value);
   if (!s) return;
   const r = { q: p.q, g: $('a').value.trim(), m: s.m };
-  results.push(r); total += s.m; addLog(r); pop(s);
+  results.push(r); total += s.m; addLog(r);
+  $('f').classList.add('hide');
   $('msg').innerHTML = '';
   $('msg').append(`${s.emoji} ${s.name} · ${s.blurb}`, document.createElement('br'), `rarest answer: ${p.a[p.a.length - 1].split('/')[0]}`);
   at++;
-  if (mode === 'daily' && at === 7) { try { localStorage.setItem('dive2-' + today, JSON.stringify(results)); } catch {} finish(); }
-  else next();
+  const last = mode === 'daily' && at === 7;
+  if (last) { try { localStorage.setItem('dive2-' + today, JSON.stringify(results)); } catch {} }
+  dive(s, last ? finish : next);
 };
 $('bDaily').onclick = () => start('daily');
 $('bInf').onclick = () => start('inf');
