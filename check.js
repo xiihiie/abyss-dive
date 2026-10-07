@@ -1,9 +1,9 @@
 // Smoke test: run game.js against a stub DOM and check the scoring.
-const el = () => ({ classList: { toggle() {}, remove() {}, add() {} }, style: { setProperty() {} }, insertAdjacentHTML() {}, appendChild() {}, append() {}, firstChild: { firstChild: {} }, value: '', focus() {} });
+const el = () => ({ classList: { toggle() {}, remove() {}, add() {} }, style: { setProperty() {} }, insertAdjacentHTML() {}, appendChild() {}, append() {}, prepend() {}, offsetHeight: 0, firstChild: { firstChild: {} }, value: '', focus() {} });
 const els = {};
 global.window = {}; global.localStorage = { getItem: () => null, setItem() {} };
 global.setInterval = () => 0; global.clearInterval = () => {}; global.setTimeout = () => 0;
-global.requestAnimationFrame = () => {}; global.performance = { now: () => 0 };
+global.requestAnimationFrame = () => {}; global.innerHeight = 800; global.performance = { now: () => 0 };
 global.document = { getElementById: id => els[id] || (els[id] = el()), body: el(), createElement: el };
 require('./data.js');
 const src = require('fs').readFileSync('game.js', 'utf8') + ';module.exports={score,PROMPTS,NICHE,dailySet}';

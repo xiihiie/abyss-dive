@@ -4,99 +4,143 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Abyss Dive</title>
-<meta name="theme-color" content="#050a14">
-<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+<meta name="description" content="Seven prompts a day. Rare answers dive deeper.">
+<meta name="theme-color" content="#04101d">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--fg:#e6f4ff;--dim:#8fb0cf;--accent:#4fd1c5}
+:root{--fg:#e8f3ff;--dim:#7f9bb8;--faint:rgba(255,255,255,.08);--line:rgba(255,255,255,.12);--accent:#4fd1c5;--panel:rgba(4,14,28,.72);--display:'VT323',monospace;--ui:'JetBrains Mono',ui-monospace,monospace}
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100vh;overflow-x:hidden}
-body{background:#03101d;color:var(--fg);font-family:'VT323',monospace;font-size:22px}
-/* the world: one tall ocean that slides up as you sink */
+body{background:#020a14;color:var(--fg);font-family:var(--ui);font-size:15px;line-height:1.5}
+/* faint CRT scanlines over everything */
+body::after{content:"";position:fixed;inset:0;z-index:9;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 1px,transparent 1px 3px);mix-blend-mode:multiply}
+/* ---- the ocean ---- */
 #ocean{position:fixed;inset:0;overflow:hidden;z-index:0}
-#world{position:absolute;left:0;right:0;top:0;height:600vh;transition:transform 2s cubic-bezier(.45,0,.2,1);
-  background:linear-gradient(180deg,#7cc8ff 0%,#3a9be0 3%,#16649f 10%,#0d4374 20%,#0a2a4f 34%,#061934 50%,#030c1a 68%,#010409 85%,#000 100%)}
-#world::before{content:"";position:absolute;left:-10%;right:-10%;top:0;height:60vh;pointer-events:none;
-  background:repeating-linear-gradient(100deg,rgba(255,255,255,.12) 0 4%,transparent 4% 11%);mask-image:linear-gradient(#000,transparent);-webkit-mask-image:linear-gradient(#000,transparent);animation:rays 9s ease-in-out infinite alternate}
+#world{position:absolute;left:0;right:0;top:0;height:800vh;will-change:transform;
+  background:linear-gradient(180deg,#86d0ff 0%,#3d9fe3 2%,#1a6aa8 7%,#0e4a7e 14%,#0a3260 24%,#07214a 36%,#04142f 50%,#020a1c 66%,#01050f 82%,#000 100%)}
+#world::before{content:"";position:absolute;left:-10%;right:-10%;top:0;height:70vh;pointer-events:none;
+  background:repeating-linear-gradient(100deg,rgba(255,255,255,.14) 0 3%,transparent 3% 10%);-webkit-mask-image:linear-gradient(#000,transparent);mask-image:linear-gradient(#000,transparent);animation:rays 9s ease-in-out infinite alternate}
 @keyframes rays{to{transform:translateX(5%) skewX(-4deg)}}
-#world::after{content:"";position:absolute;left:0;right:0;top:0;height:14px;background:radial-gradient(circle at 10px -4px,transparent 10px,rgba(255,255,255,.55) 11px,transparent 13px) 0 0/20px 14px repeat-x;animation:wave 3s linear infinite}
-@keyframes wave{to{background-position:20px 0}}
-.zone{position:absolute;left:16px;font-size:26px;letter-spacing:6px;color:rgba(255,255,255,.28);text-transform:uppercase}
-.tick{position:absolute;right:0;width:110px;border-top:1px solid rgba(255,255,255,.18);font-size:16px;color:rgba(255,255,255,.35);text-align:right;padding:2px 8px 0 0}
-.crt{position:absolute;font-size:34px;opacity:.75;animation:drift 7s ease-in-out infinite alternate;filter:drop-shadow(0 0 6px rgba(120,200,255,.25))}
-@keyframes drift{to{transform:translate(40px,-14px)}}
-/* marine snow: drifts up slowly, streaks while diving */
+#world::after{content:"";position:absolute;left:0;right:0;top:0;height:16px;background:radial-gradient(circle at 12px -5px,transparent 11px,rgba(255,255,255,.6) 12px,transparent 14px) 0 0/24px 16px repeat-x;animation:wave 3s linear infinite}
+@keyframes wave{to{background-position:24px 0}}
+.zone{position:absolute;left:24px;font-family:var(--display);font-size:30px;letter-spacing:8px;color:rgba(255,255,255,.3);text-transform:uppercase}
+.tick{position:absolute;right:0;width:130px;border-top:1px solid rgba(255,255,255,.22);font-size:12px;color:rgba(255,255,255,.4);text-align:right;padding:3px 12px 0 0;letter-spacing:1px}
+.crt{position:absolute;opacity:.8;animation:drift 7s ease-in-out infinite alternate;filter:drop-shadow(0 0 8px rgba(120,200,255,.3))}
+@keyframes drift{to{transform:translate(46px,-16px)}}
 #snow{position:fixed;inset:0;pointer-events:none;z-index:1}
-#snow i{position:absolute;bottom:-10px;width:3px;height:3px;border-radius:50%;background:#cfe8ff;animation:snow 12s linear infinite}
-@keyframes snow{to{transform:translateY(-110vh)}}
-body.diving #snow i{animation-duration:1.1s;height:22px;border-radius:2px}
-body.diving #world{filter:saturate(1.2)}
-/* UI */
-main{position:relative;z-index:2;max-width:580px;margin:0 auto;padding:20px 16px 120px}
-h1{font-size:56px;letter-spacing:6px;text-align:center;margin:4px 0 0;color:#fff;text-shadow:0 0 18px rgba(79,209,197,.7);animation:bob 4s ease-in-out infinite}
-@keyframes bob{50%{transform:translateY(6px)}}
-.tag{text-align:center;color:var(--dim);margin-bottom:14px}
-nav{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
-button{font:inherit;background:rgba(3,12,24,.6);color:var(--fg);border:2px solid var(--dim);padding:6px 14px;cursor:pointer;transition:.15s}
-button:hover,button.on{border-color:var(--accent);color:var(--accent)}
-button:active{transform:translateY(2px)}
-#panel{background:rgba(3,12,24,.55);border:2px solid rgba(255,255,255,.12);padding:16px;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
-.gauge{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
-#meters{font-size:40px;color:#fff;text-shadow:0 0 12px rgba(120,200,255,.6)}
-#pts{color:var(--dim)}
-.step{color:var(--dim);text-align:center;margin-top:8px}
-.prompt{font-size:34px;text-align:center;margin:10px 0 14px}
+#snow i{position:absolute;bottom:-10px;width:3px;height:3px;border-radius:50%;background:#d6ecff;animation:snow 14s linear infinite}
+@keyframes snow{to{transform:translateY(-112vh)}}
+body.diving #snow i{animation-duration:.9s;height:26px;width:2px;border-radius:1px}
+/* full-screen readout while diving */
+#hud{position:fixed;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;pointer-events:none;opacity:0;transition:opacity .4s}
+body.diving #hud{opacity:1}
+#bigdepth{font-family:var(--display);font-size:clamp(64px,14vw,140px);line-height:1;color:#fff;text-shadow:0 0 30px rgba(120,200,255,.7)}
+#bigtier{font-family:var(--display);font-size:clamp(34px,7vw,64px);min-height:1.2em;text-shadow:0 0 20px currentColor;transform:scale(.6);opacity:0;transition:transform .35s cubic-bezier(.2,1.6,.4,1),opacity .2s}
+body.deep #bigtier{transform:scale(1);opacity:1}
+/* ---- UI ---- */
+main{position:relative;z-index:2;max-width:640px;margin:0 auto;padding:0 16px 120px;transition:opacity .4s,transform .4s}
+body.diving main{opacity:0;transform:translateY(-20px);pointer-events:none}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 0;flex-wrap:wrap}
+.logo{font-family:var(--display);font-size:40px;letter-spacing:5px;line-height:1;color:#fff;text-shadow:0 0 16px rgba(79,209,197,.6)}
+.logo small{display:block;font-family:var(--ui);font-size:11px;letter-spacing:3px;color:var(--dim);text-transform:uppercase;text-shadow:none;margin-top:4px}
+nav{display:flex;gap:6px;flex-wrap:wrap}
+button{font:inherit;cursor:pointer}
+nav button,.pager button{background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:7px 12px;font-size:13px;transition:.15s}
+nav button:hover,nav button.on{border-color:var(--accent);color:var(--accent);box-shadow:0 0 12px rgba(79,209,197,.25)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 20px 50px rgba(0,0,0,.35)}
+#help p{margin:0 0 8px;color:var(--dim)}
+#help{margin-bottom:12px}
+.gauge{display:flex;justify-content:space-between;align-items:baseline}
+#meters{font-family:var(--display);font-size:34px;line-height:1;color:#fff}
+#pts{font-size:13px;color:var(--dim)}
+.step{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--dim);margin-top:14px}
+.prompt{font-family:var(--display);font-size:clamp(30px,6vw,42px);line-height:1.05;margin:6px 0 16px}
 .prompt.in{animation:drop .5s cubic-bezier(.2,1.4,.4,1)}
-@keyframes drop{from{opacity:0;transform:translateY(-30px)}}
-#timer{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-#timer .track{flex:1;height:10px;background:rgba(255,255,255,.12)}
-#bar{height:100%;background:var(--accent);transition:width .1s linear}
+@keyframes drop{from{opacity:0;transform:translateY(-24px)}}
+#timer{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+#timer .track{flex:1;height:6px;border-radius:3px;background:var(--faint);overflow:hidden}
+#bar{height:100%;background:linear-gradient(90deg,var(--accent),#7fe3ff);transition:width .1s linear}
+#secs{font-size:13px;width:3ch;text-align:right;color:var(--dim)}
 #timer.low #bar{background:#fc8181}
 #timer.low #secs{color:#fc8181;animation:pulse .5s infinite alternate}
 @keyframes pulse{to{opacity:.4}}
 form{display:flex;gap:8px}
-input{flex:1;min-width:0;font:inherit;background:rgba(5,18,34,.9);color:var(--fg);border:2px solid var(--dim);padding:8px;outline:none}
-input:focus{border-color:var(--accent);box-shadow:0 0 12px rgba(79,209,197,.35)}
+input{flex:1;min-width:0;font:inherit;font-size:16px;background:rgba(2,10,20,.85);color:var(--fg);border:1px solid var(--line);border-radius:8px;padding:12px 14px;outline:none;transition:.15s}
+input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,209,197,.18)}
+form button{background:var(--accent);color:#02121c;border:0;border-radius:8px;padding:0 20px;font-weight:700;letter-spacing:1px;transition:.15s}
+form button:hover{filter:brightness(1.1)}
+form button:active{transform:translateY(1px)}
 .shake{animation:shake .4s}
 @keyframes shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
-.msg{min-height:56px;text-align:center;margin:12px 0}
-.row{display:flex;justify-content:space-between;gap:12px;border-bottom:1px dashed rgba(255,255,255,.12);padding:4px 0;animation:drop .4s}
+.msg{min-height:24px;margin-top:12px;color:var(--dim);font-size:14px}
 .hide{display:none!important}
-pre{white-space:pre-wrap;text-align:center;font:inherit}
-.pop{position:fixed;left:50%;top:38%;z-index:5;white-space:nowrap;font-size:44px;text-shadow:0 0 16px currentColor;pointer-events:none;animation:popup 1.8s ease-out forwards}
-@keyframes popup{from{opacity:0;transform:translate(-50%,30px) scale(.5)}20%{opacity:1;transform:translate(-50%,0) scale(1.2)}35%{transform:translate(-50%,0) scale(1)}to{opacity:0;transform:translate(-50%,-90px)}}
-.bub{position:fixed;bottom:-20px;width:12px;height:12px;border:2px solid rgba(220,240,255,.7);border-radius:50%;z-index:4;pointer-events:none;animation:rise 1.5s ease-in forwards}
-.bub.amb{width:7px;height:7px;opacity:.45;z-index:1}
+pre{white-space:pre-wrap;font:inherit;margin:12px 0 0;color:var(--dim)}
+/* ---- the catch ---- */
+#catch{margin-top:16px;padding:0;overflow:hidden}
+.catch-h{display:flex;gap:12px;align-items:baseline;padding:14px 18px;border-bottom:1px solid var(--line)}
+.catch-h b{font-size:12px;letter-spacing:3px}
+.catch-h span{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--dim)}
+.round{border-bottom:1px solid var(--line)}
+.round:last-child{border-bottom:0}
+.rhead{display:flex;align-items:center;gap:14px;width:100%;background:none;border:0;color:inherit;text-align:left;padding:12px 18px;transition:background .15s}
+.rhead:hover,.round.open .rhead{background:rgba(255,255,255,.04)}
+.rn{color:var(--dim);font-size:13px;width:2ch}
+.rmid{flex:1;min-width:0;display:flex;flex-direction:column}
+.rq{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--dim)}
+.rg{font-weight:700;font-size:16px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rp{font-weight:700;font-size:13px}
+.rbody{padding:0 18px 16px;animation:drop .3s}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 10px}
+.chip{background:transparent;color:var(--c);border:1px solid var(--line);border-radius:6px;padding:5px 10px;font-size:12px;transition:.15s}
+.chip.on{border-color:var(--c);box-shadow:inset 0 0 0 1px var(--c)}
+.search{width:100%;font-size:14px;padding:9px 12px;margin-bottom:6px}
+.alist{max-height:340px;overflow-y:auto;background:rgba(0,0,0,.25);border-radius:8px;padding:4px 0}
+.ans{display:flex;gap:12px;align-items:center;padding:8px 14px;font-size:14px}
+.ans:nth-child(odd){background:rgba(255,255,255,.02)}
+.ans.mine{background:rgba(79,209,197,.14);box-shadow:inset 3px 0 0 var(--accent)}
+.ae{width:1.4em;text-align:center}
+.an{flex:1;font-weight:600}
+.ap{font-size:12px;font-weight:700}
+.pager{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:12px;color:var(--dim)}
+.pager button:disabled{opacity:.35;cursor:default}
+.bub{position:fixed;bottom:-20px;width:12px;height:12px;border:2px solid rgba(220,240,255,.75);border-radius:50%;z-index:5;pointer-events:none;animation:rise 1.5s ease-in forwards}
 @keyframes rise{to{transform:translate(var(--dx,0),-110vh)}}
-@media (max-width:600px){.tick{width:80px;font-size:14px}.zone{font-size:20px}h1{font-size:44px}}
-@media (prefers-reduced-motion:reduce){*{animation:none!important}#world{transition-duration:0s!important}}
+@media (max-width:600px){.tick{width:84px;font-size:11px}.zone{font-size:22px;left:14px}.logo{font-size:32px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:0s!important}}
 </style>
 </head>
 <body>
 <div id="ocean" aria-hidden="true"><div id="world"></div></div>
 <div id="snow" aria-hidden="true"></div>
+<div id="hud" aria-live="polite"><div id="bigdepth">0 m</div><div id="bigtier"></div></div>
 <main>
-<h1>ABYSS DIVE</h1>
-<div class="tag">rare answers sink you deeper</div>
-<nav>
-  <button id="bDaily" class="on">Daily dive</button>
-  <button id="bInf">∞ Unlimited</button>
-  <button id="bHelp">How to play</button>
-</nav>
-<section id="help" class="hide">
+<header>
+  <div class="logo">ABYSS DIVE<small>rare answers dive deeper</small></div>
+  <nav>
+    <button id="bDaily" class="on">Daily dive</button>
+    <button id="bInf">∞ Unlimited</button>
+    <button id="bHelp">How to play</button>
+  </nav>
+</header>
+<section id="help" class="card hide">
   <p>Seven prompts a day, the same for everyone. You get 25 seconds per prompt.</p>
   <p>Your answer has to be on the list. If it isn't, try another before time runs out. Run out of time and you score 0.</p>
-  <p>🫧 Bubble +10 · 🐟 Minnow +30 · 🪼 Jelly +60 · 🏮 Angler +85 · 🐋 Leviathan +100 · ⏱️ out of time 0</p>
-  <p>Ranks: 0–150 Surface skimmer · 151–250 Reef wanderer · 251–350 Twilight diver · 351–449 Midnight lurker · 450+ Abyss legend</p>
+  <p>🫧 Bubble +10 · 🐟 Minnow +30 · 🪼 Jelly +60 · 🏮 Angler +85 · 🐋 Leviathan +100</p>
+  <p>0–150 Surface skimmer · 151–250 Reef wanderer · 251–350 Twilight diver · 351–449 Midnight lurker · 450+ Abyss legend</p>
 </section>
-<section id="panel">
+<section id="panel" class="card">
   <div class="gauge"><span id="meters">0 m</span><span id="pts">0 pts</span></div>
   <div class="step" id="step"></div>
   <div class="prompt" id="prompt"></div>
   <div id="timer"><div class="track"><div id="bar"></div></div><span id="secs">25s</span></div>
-  <form id="f"><input id="a" autocomplete="off" placeholder="your answer..." aria-label="Answer"><button>Dive</button></form>
+  <form id="f"><input id="a" autocomplete="off" placeholder="Type your answer…" aria-label="Answer"><button>DIVE</button></form>
   <div class="msg" id="msg" aria-live="polite"></div>
-  <div class="log" id="log"></div>
   <pre id="share"></pre>
+</section>
+<section id="catch" class="card hide">
+  <div class="catch-h"><b>YOUR CATCH</b><span>tap a round for every answer</span></div>
+  <div id="rounds"></div>
 </section>
 </main>
 <script src="data.js"></script>
