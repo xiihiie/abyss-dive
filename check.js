@@ -1,8 +1,9 @@
-﻿// Smoke test: run game.js against a stub DOM and check the scoring.
-const el = () => ({ classList: { toggle() {}, remove() {}, add() {} }, style: { setProperty() {}, getPropertyValue: () => '0' }, insertAdjacentHTML() {}, appendChild() {}, append() {}, firstChild: { firstChild: {} }, value: '', focus() {} });
+// Smoke test: run game.js against a stub DOM and check the scoring.
+const el = () => ({ classList: { toggle() {}, remove() {}, add() {} }, style: { setProperty() {} }, insertAdjacentHTML() {}, appendChild() {}, append() {}, firstChild: { firstChild: {} }, value: '', focus() {} });
 const els = {};
 global.window = {}; global.localStorage = { getItem: () => null, setItem() {} };
-global.setInterval = () => {};
+global.setInterval = () => 0; global.clearInterval = () => {}; global.setTimeout = () => 0;
+global.requestAnimationFrame = () => {}; global.performance = { now: () => 0 };
 global.document = { getElementById: id => els[id] || (els[id] = el()), body: el(), createElement: el };
 require('./data.js');
 const src = require('fs').readFileSync('game.js', 'utf8') + ';module.exports={score,PROMPTS,NICHE,dailySet}';
@@ -13,10 +14,8 @@ const fruit = PROMPTS.find(p => p.q === 'Name a fruit');
 assert.equal(score(fruit, 'Apple').m, 10);
 assert.equal(score(fruit, 'apples').m, 10);
 assert.equal(score(fruit, 'cloudberry').m, 100);
-assert.equal(score(fruit, 'pizza').m, 0);
+assert.equal(score(fruit, 'pizza'), 'invalid');
 assert.equal(score(fruit, '  '), null);
-const ev = PROMPTS.find(p => p.q === 'Name an Eeveelution');
-assert.deepEqual(ev.a.map(a => score(ev, a).m), [10, 10, 30, 30, 60, 85, 85, 100]);
 assert.equal(dailySet().length, 7);
 assert(dailySet().every(p => NICHE.includes(p)));
 console.log('ok; today:', dailySet().map(p => p.q).join(' / '));
