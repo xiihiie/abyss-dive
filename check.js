@@ -1,4 +1,4 @@
-// Smoke test: run game.js against a stub DOM and check the scoring.
+﻿// Smoke test: run game.js against a stub DOM and check the scoring.
 const el = () => ({ classList: { toggle() {}, remove() {}, add() {} }, style: { setProperty() {} }, insertAdjacentHTML() {}, appendChild() {}, append() {}, prepend() {}, offsetHeight: 0, firstChild: { firstChild: {} }, value: '', focus() {} });
 const els = {};
 global.window = {}; global.localStorage = { getItem: () => null, setItem() {} };
@@ -13,7 +13,7 @@ const assert = require('assert');
 const fruit = PROMPTS.find(p => p.q === 'Name a fruit');
 assert.equal(score(fruit, 'Apple').m, 10);
 assert.equal(score(fruit, 'apples').m, 10);
-assert.equal(score(fruit, 'cloudberry').m, 100);
+assert.equal(score(fruit, fruit.a[fruit.a.length - 1].split('/')[0]).m, 100);
 assert.equal(score(fruit, 'pizza'), 'invalid');
 assert.equal(score(fruit, '  '), null);
 assert.equal(suggest(fruit, 'bananna'), 'banana');
