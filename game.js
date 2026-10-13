@@ -33,6 +33,27 @@ function score(p, guess) {
   return { ...t, m: t.pts };
 }
 
+// closest list answer within a small edit distance, for "did you mean" on typos
+function lev(a, b) {
+  let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i];
+    for (let j = 1; j <= b.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] !== b[j - 1]));
+    prev = cur;
+  }
+  return prev[b.length];
+}
+function suggest(p, guess) {
+  const g = norm(guess);
+  if (g.length < 3) return null;
+  let best = null, bestD = g.length <= 5 ? 2 : 3; // 1 typo for short words, 2 for longer
+  for (const x of p.a) for (const alias of x.split('/')) {
+    const d = lev(g, norm(alias));
+    if (d < bestD) { best = alias; bestD = d; }
+  }
+  return best;
+}
+
 // mulberry32 seeded by date so the daily dive is the same for everyone
 function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 const today = new Date().toISOString().slice(0, 10);
@@ -247,8 +268,9 @@ $('f').onsubmit = e => {
   if (!s) return;
   if (s === 'invalid') {
     shake($('a'));
-    $('msg').textContent = `🪝 "${guess}" isn't on the list. Try another!`;
-    $('a').value = '';
+    const sug = suggest(set[at], guess);
+    $('msg').textContent = sug ? `🤔 Did you mean "${sug}"? Press Enter to use it.` : `🪝 "${guess}" isn't on the list. Try another!`;
+    $('a').value = sug || '';
     return;
   }
   resolve(s, guess);
