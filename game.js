@@ -17,7 +17,9 @@ const TIERS = [
   { depth: 0.98, max: 1, pts: 100, name: 'Leviathan', emoji: '🐋', blurb: 'nobody else got that', color: '#ffd84d' },
 ];
 const TIMEOUT = { depth: 0.02, pts: 0, m: 0, name: 'Out of time', emoji: '⏱️', blurb: 'the clock ran out', color: '#fc8181' };
-const tierOf = (i, n) => TIERS.find(t => i / Math.max(1, n - 1) <= t.max);
+// Only the last 1-3 answers on a list are Leviathans; everything else deep is Angler.
+const LEVI = n => Math.min(3, Math.max(1, Math.floor(n / 50)));
+const tierOf = (i, n) => n - i <= LEVI(n) ? TIERS[4] : TIERS.find(t => t.pts < 100 && i / Math.max(1, n - 1) <= t.max) || TIERS[3];
 const RANKS = [[0, 'Surface skimmer'], [151, 'Reef wanderer'], [251, 'Twilight diver'], [351, 'Midnight lurker'], [450, 'Abyss legend']];
 const rank = m => RANKS.filter(r => m >= r[0]).pop()[1];
 const SECONDS = 25;
